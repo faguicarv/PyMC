@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import csv
 
 # Geometry definition
-sphere_r = 500.0 # With this vector we will define a sphere of radius 100.0
+sphere_r = 30.0 # With this vector we will define a sphere of radius 100.0
 
 # Layout with all information of the particle
 particle_layout = np.dtype([
@@ -36,10 +36,19 @@ sigma_mat = 1e-1
 
 beam_final = np.zeros(nro_part, dtype=particle_layout)
 for i in range(nro_part):
-    length = -np.log(np.random.rand(1)) / sigma_mat
     beam_final[i] = beam[i]
-    beam_final[i]['pos'] = beam_final[i]['pos'] + (length * beam_final[i]['dir'])
-    print(beam_final)
+    while np.any(beam_final[i]['alive']):
+        length = -np.log(np.random.rand(1)) / sigma_mat
+        beam_final[i]['pos'] = beam_final[i]['pos'] + (length * beam_final[i]['dir'])
+        norm = np.linalg.norm(beam_final[i]['pos'])
+        if (norm > sphere_r):
+            beam_final[i]['alive'] = False
+            beam_final[i]['pos'] = [0.0, 0.0, sphere_r]
+
+        print(beam_final[i])
+
+print(beam_final)
+
 
 
 #
