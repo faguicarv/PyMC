@@ -93,6 +93,15 @@ for i in range(nro_part):
         z_min, z_max = (box[0]['zdims'][0], (box[0]['zdims'][1]
 
         tmin, tmax = -float('inf'), float('inf')
+        for j in range(3):
+            t1, t2 = (x_min - pos[j]) / dirc[j], (x_max - pos[j]) / dirc[j] # Distance to planes of the axis
+
+            t_in_axis, t_out_axis = min(t1, t2), max(t1. t2)
+
+            t_in_max = max(t_in_max, t_in_axis)
+            t_out_min = min(t_out_min, t_out_axis)
+
+            if
 
 
 
