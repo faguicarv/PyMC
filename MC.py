@@ -40,20 +40,28 @@ beam['type'], beam['pos'], beam['energy'], beam['dir'], beam['alive'] = part_typ
 # --------- GEOMETRY DEFINITION ---------
 ## --------- UNIVERSE ---------
 sphere_r = 10.0 # With this vector we will define a sphere of radius 10.0
-
+box_
 # Once the beam is ready, the transport occur in the incoming lines
 sigma_vac = 1e-14
 sigma_mat = 1e-1
 
 beam_final = np.zeros(nro_part, dtype=particle_layout)
 for i in range(nro_part):
+
     print(f"Transporte de la partícula {i+1}")
     beam_final[i] = beam[i] # Copy beam information in a new layout
-    cont=0
+    cont = 0
+
+    # Verify if the particle is inside the sphere
+    if (beam_final[i]['pos'].dot(beam_final[i]['pos']) > sphere_r**2):
+        beam_final[i]['alive'] = False
+
     while (beam_final[i]['alive']):
         cont += 1
         dist_sigma = -np.log(np.random.rand(1)) / sigma_mat # Calculate sigma distance
-        dist_bound = sphere_r - np.linalg.norm(beam_final[i]['pos']) # Calculate boundary distance
+        dist_bound =
+
+        # dist_bound = sphere_r - np.linalg.norm(beam_final[i]['pos']) # Calculate boundary distance
         distance = min(dist_sigma, dist_bound) # Choose the minimum distance between the two
         # If the particle is at the boundary, then distance is zero and the loop will be infinite.
         # if (distance > 1e-7):
