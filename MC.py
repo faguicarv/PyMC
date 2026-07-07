@@ -34,7 +34,7 @@ particle_layout = np.dtype([
     ])
 
 beam = np.zeros(nro_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
-beam['type'], beam['pos'], beam['energy'], beam['dir'], beam['alive'] = part_type, pos_0, energy_0, dir_0, True # Fill the beam layout with the data of the beam definition
+beam['type'], beam['pos'], beam['energy'], beam['dir'], beam['alive'], beam['region'] = part_type, pos_0, energy_0, dir_0, True, int(20) # Fill the beam layout with the data of the beam definition
 
 
 # --------- GEOMETRY DEFINITION ---------
@@ -48,9 +48,6 @@ box_layout = np.dtype([
 
 box = np.zeros(1, dtype=box_layout)
 box['xdims'], box['ydims'], box['zdims'] = np.array([-4.0, 4.0]), np.array([-4.0, 4.0]), np.array([5.0, 15.0])
-
-print(box)
-
 
 # Once the beam is ready, the transport occur in the incoming lines
 sigma_sph = 1e1
@@ -82,6 +79,8 @@ for i in range(nro_part):
             sigma = sigma_sph
         elif (region == 2):
             sigma = sigma_box
+
+        beam_final[i]['region'] = region
 
         # Calculate sigma distance
         dist_sigma = -np.log(np.random.rand(1)) / sigma
