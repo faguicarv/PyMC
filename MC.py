@@ -63,6 +63,7 @@ for i in range(nro_part):
         pos = beam_final[i]['pos']
         dirc = beam_final[i]['dir']
         region = beam_final[i]['region']
+
         # Verify where the particle is
         if (box[0]['xdims'][0] <= pos[0] <= box[0]['xdims'][1] and
             box[0]['ydims'][0] <= pos[1] <= box[0]['ydims'][1] and
@@ -82,9 +83,58 @@ for i in range(nro_part):
 
         beam_final[i]['region'] = region
 
-        # Calculate sigma distance
+        # Calculate distance of next step
+        ## Calculate sigma distance
         dist_sigma = -np.log(np.random.rand(1)) / sigma
-        beam_final[i]['pos'] = beam_final[i]['pos'] + (dist_sigma * beam_final[i]['dir']) # Add minimum distance to initial position
+
+        ## Calculate distance to box
+        x_min, x_max = (box[0]['xdims'][0], (box[0]['xdims'][1]
+        y_min, y_max = (box[0]['ydims'][0], (box[0]['ydims'][1]
+        z_min, z_max = (box[0]['zdims'][0], (box[0]['zdims'][1]
+
+        tmin, tmax = -float('inf'), float('inf')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # Now the position change with this step
+        pos = beam_final[i]['pos'] + (dist_sigma * beam_final[i]['dir']) #
+        # But needs to see if the particle crosses the boundary surface
+        region_aux = 20
+        if (box[0]['xdims'][0] <= pos[0] < box[0]['xdims'][1] and
+            box[0]['ydims'][0] <= pos[1] < box[0]['ydims'][1] and
+            box[0]['zdims'][0] <= pos[2] < box[0]['zdims'][1]):
+            region_aux = 2
+        elif (np.dot(pos, pos) > sphere_r**2):
+            region_aux = 3
+            beam_final[i]['alive'] = False
+            beam_final[i]['pos'] =
+            continue
+        else:
+            region_aux = 1
+
+        if (region == region_aux): # It means that after the step is in the same region, then apply the traslation and change the position.
+            beam_final[i]['pos'] = pos
+        else: # If not, the particle changed the region, so should be in the boundary
+            # pos[0] = box[0]['xdims'][1]
+            # pos[1] = box[0]['ydims'][1]
+            # pos[2] = box[0]['zdims'][1]
+
+        beam_final[i]['pos'] = pos
 
         print(beam_final[i])
 
