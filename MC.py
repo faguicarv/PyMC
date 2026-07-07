@@ -29,59 +29,89 @@ particle_layout = np.dtype([
     ("pos", 'f8', (3,)), # Position
     ('energy', 'f8'), # Energy
     ('dir', 'f8', (3,)), # Direction
+    ('region', 'f8'), # Region
     ('alive', 'b1') # Border condition
     ])
 
 beam = np.zeros(nro_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
-
 beam['type'], beam['pos'], beam['energy'], beam['dir'], beam['alive'] = part_type, pos_0, energy_0, dir_0, True # Fill the beam layout with the data of the beam definition
 
 
 # --------- GEOMETRY DEFINITION ---------
 ## --------- UNIVERSE ---------
-sphere_r = 10.0 # With this vector we will define a sphere of radius 10.0
-box_
+sphere_r = 30.0 # With this vector we will define a sphere of radius 10.0
+box_layout = np.dtype([
+    ("xdims", 'f8', (2,)),
+    ("ydims", 'f8', (2,)),
+    ("zdims", 'f8', (2,)),
+    ])
+
+box = np.zeros(1, dtype=box_layout)
+box['xdims'], box['ydims'], box['zdims'] = np.array([-4.0, 4.0]), np.array([-4.0, 4.0]), np.array([5.0, 15.0])
+
+print(box)
+
+
 # Once the beam is ready, the transport occur in the incoming lines
-sigma_vac = 1e-14
-sigma_mat = 1e-1
+sigma_sph = 1e1
+sigma_box = 5e1
 
 beam_final = np.zeros(nro_part, dtype=particle_layout)
 for i in range(nro_part):
-
     print(f"Transporte de la partícula {i+1}")
     beam_final[i] = beam[i] # Copy beam information in a new layout
     cont = 0
-
-    # Verify if the particle is inside the sphere
-    if (beam_final[i]['pos'].dot(beam_final[i]['pos']) > sphere_r**2):
-        beam_final[i]['alive'] = False
-
     while (beam_final[i]['alive']):
         cont += 1
-        dist_sigma = -np.log(np.random.rand(1)) / sigma_mat # Calculate sigma distance
-        dist_bound =
-
-        # dist_bound = sphere_r - np.linalg.norm(beam_final[i]['pos']) # Calculate boundary distance
-        distance = min(dist_sigma, dist_bound) # Choose the minimum distance between the two
-        # If the particle is at the boundary, then distance is zero and the loop will be infinite.
-        # if (distance > 1e-7):
-        if (distance <= 0.0):
+        pos = beam_final[i]['pos']
+        dirc = beam_final[i]['dir']
+        region = beam_final[i]['region']
+        # Verify where the particle is
+        if (box[0]['xdims'][0] <= pos[0] <= box[0]['xdims'][1] and
+            box[0]['ydims'][0] <= pos[1] <= box[0]['ydims'][1] and
+            box[0]['zdims'][0] <= pos[2] <= box[0]['zdims'][1]):
+            region = 2
+        elif (np.dot(pos, pos) > sphere_r**2):
+            region = 3
             beam_final[i]['alive'] = False
+            continue
         else:
-            beam_final[i]['pos'] = beam_final[i]['pos'] + (distance * beam_final[i]['dir']) # Add minimum distance to initial position
+            region = 1
 
-        print(f"Paso {cont}")
+        if (region == 1):
+            sigma = sigma_sph
+        elif (region == 2):
+            sigma = sigma_box
+
+        # Calculate sigma distance
+        dist_sigma = -np.log(np.random.rand(1)) / sigma
+        beam_final[i]['pos'] = beam_final[i]['pos'] + (dist_sigma * beam_final[i]['dir']) # Add minimum distance to initial position
+
         print(beam_final[i])
 
 print(beam_final)
-#         dist_step = -np.log(np.random.rand(1)) / sigma_mat
-#         dist_bound = np.sum(beam_final[i]['pos'] * beam_final[i]['dir'])
-#         dist = np.minimum(dist_step, dist_bound)
-#         beam_final[i]['pos'] = beam_final[i]['pos'] + (dist * beam_final[i]['dir'])
-#         norm = np.linalg.norm(beam_final[i]['pos'])
-#         if (norm > sphere_r):
-#             pichintun = sphere_r - norm
+
+
+#         # dist_bound = sphere_r - np.linalg.norm(beam_final[i]['pos']) # Calculate boundary distance
+#         distance = min(dist_sigma, dist_bound) # Choose the minimum distance between the two
+#         # If the particle is at the boundary, then distance is zero and the loop will be infinite.
+#         # if (distance > 1e-7):
+#         if (distance <= 0.0):
 #             beam_final[i]['alive'] = False
+#         else:
+#
+#
+#         print(f"Paso {cont}")
+#         print(beam_final[i])
+#
+# print(beam_final)
+# #         dist_bound = np.sum(beam_final[i]['pos'] * beam_final[i]['dir'])
+# #         dist = np.minimum(dist_step, dist_bound)
+# #         beam_final[i]['pos'] = beam_final[i]['pos'] + (dist * beam_final[i]['dir'])
+# #         norm = np.linalg.norm(beam_final[i]['pos'])
+# #         if (norm > sphere_r):
+# #             pichintun = sphere_r - norm
+# #             beam_final[i]['alive'] = False
 #             beam_final[i]['pos'] = beam_final[i]['pos'] + (pichintun * beam_final[i]['dir'])
 #             norm = np.linalg.norm(beam_final[i]['pos'])
 #
