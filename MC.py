@@ -119,11 +119,18 @@ for i in range(nro_part):
             if region == 2:
                 # Si ya está DENTRO de la caja, la distancia que nos importa es la de SALIDA
                 dist_geo = t_out_box
+                print("Usando la distancia de salida de la caja")
             else:
                 # Si está FUERA de la caja, la distancia es la de ENTRADA (si está adelante)
                 dist_geo = t_in_box if t_in_box > 0 else np.inf
-        else:
-            dist_geo = np.inf
+                print("Usando la distancia de entrada a la caja")
+        else: # In this case we already pass the box and the trayectory is to the boundary. So, we need to solve the sphere distance equation
+            A_sph = np.dot(dirc, dirc)
+            B_sph = 2.0 * np.dot(pos, dirc)
+            C_sph = np.dot(pos, pos) - sphere_r**2
+            disc = B_sph**2 - 4.0 * A_sph * C_sph
+            dist_geo = (-B_sph + np.sqrt(disc)) / (2.0 * A_sph)
+
 
         ### Choose the minimum distance of the step
         step = min(dist_geo, dist_sigma)
