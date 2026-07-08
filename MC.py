@@ -88,137 +88,59 @@ for i in range(nro_part):
         dist_sigma = -np.log(np.random.rand(1)) / sigma
 
         ## Calculate distance to box
-        x_min, x_max = (box[0]['xdims'][0], (box[0]['xdims'][1]
-        y_min, y_max = (box[0]['ydims'][0], (box[0]['ydims'][1]
-        z_min, z_max = (box[0]['zdims'][0], (box[0]['zdims'][1]
+        ### Boundaries of the box in each axes
+        x_min, x_max = box[0]['xdims'][0], box[0]['xdims'][1]
+        y_min, y_max = box[0]['ydims'][0], box[0]['ydims'][1]
+        z_min, z_max = box[0]['zdims'][0], box[0]['zdims'][1]
 
-        tmin, tmax = -float('inf'), float('inf')
-        for j in range(3):
-            t1, t2 = (x_min - pos[j]) / dirc[j], (x_max - pos[j]) / dirc[j] # Distance to planes of the axis
+        ### Distance to get into the box boundaries
+        ### Auxiliar epsilon for not divide by zero
+        for k in range(3):
+            if dirc[k] < 1e-10:
+                dirc[k] = 1e-14
 
-            t_in_axis, t_out_axis = min(t1, t2), max(t1. t2)
+        tmin_x, tmax_x = (x_min - pos[0]) / dirc[0], (x_max - pos[0]) / dirc[0]
+        tmin_y, tmax_y = (y_min - pos[1]) / dirc[1], (y_max - pos[1]) / dirc[1]
+        tmin_z, tmax_z = (z_min - pos[2]) / dirc[2], (z_max - pos[2]) / dirc[2]
 
-            t_in_max = max(t_in_max, t_in_axis)
-            t_out_min = min(t_out_min, t_out_axis)
+        ### When the particle goes in and out of each boundary
+        t_in_x, t_out_x = min(tmin_x, tmax_x), max(tmin_x, tmax_x)
+        t_in_y, t_out_y = min(tmin_y, tmax_y), max(tmin_y, tmax_y)
+        t_in_z, t_out_z = min(tmin_z, tmax_z), max(tmin_z, tmax_z)
 
-            if
+        ### If the particle enters the box, should be inside the three boundaries
+        t_in_box = max(t_in_x, t_in_y, t_in_z)
 
+        ### If the particle goes out, then abandone one of the boundaries
+        t_out_box = min(t_out_x, t_out_y, t_out_z)
 
+        ### If the particle crash with the box,
+        if t_in_box <= t_out_box and t_out_box > 0:
+            if region == 2:
+                # Si ya está DENTRO de la caja, la distancia que nos importa es la de SALIDA
+                dist_geo = t_out_box
+            else:
+                # Si está FUERA de la caja, la distancia es la de ENTRADA (si está adelante)
+                dist_geo = t_in_box if t_in_box > 0 else np.inf
+        else:
+            dist_geo = np.inf
 
+        ### Choose the minimum distance of the step
+        step = min(dist_geo, dist_sigma)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        epsilon = 1e-8 if step == dist_geo else 0.0
 
         # Now the position change with this step
-        pos = beam_final[i]['pos'] + (dist_sigma * beam_final[i]['dir']) #
-        # But needs to see if the particle crosses the boundary surface
-        region_aux = 20
-        if (box[0]['xdims'][0] <= pos[0] < box[0]['xdims'][1] and
-            box[0]['ydims'][0] <= pos[1] < box[0]['ydims'][1] and
-            box[0]['zdims'][0] <= pos[2] < box[0]['zdims'][1]):
-            region_aux = 2
-        elif (np.dot(pos, pos) > sphere_r**2):
-            region_aux = 3
-            beam_final[i]['alive'] = False
-            beam_final[i]['pos'] =
-            continue
-        else:
-            region_aux = 1
-
-        if (region == region_aux): # It means that after the step is in the same region, then apply the traslation and change the position.
-            beam_final[i]['pos'] = pos
-        else: # If not, the particle changed the region, so should be in the boundary
-            # pos[0] = box[0]['xdims'][1]
-            # pos[1] = box[0]['ydims'][1]
-            # pos[2] = box[0]['zdims'][1]
+        pos = beam_final[i]['pos'] + ((step + epsilon) * beam_final[i]['dir'])
+        for k in range(3):
+            if pos[k] < 1e-10:
+                pos[k] = 0.0
+            if dirc[k] < 1e-10:
+                dirc[k] = 0.0
 
         beam_final[i]['pos'] = pos
+        beam_final[i]['region'] = region
 
         print(beam_final[i])
 
 print(beam_final)
-
-
-#         # dist_bound = sphere_r - np.linalg.norm(beam_final[i]['pos']) # Calculate boundary distance
-#         distance = min(dist_sigma, dist_bound) # Choose the minimum distance between the two
-#         # If the particle is at the boundary, then distance is zero and the loop will be infinite.
-#         # if (distance > 1e-7):
-#         if (distance <= 0.0):
-#             beam_final[i]['alive'] = False
-#         else:
-#
-#
-#         print(f"Paso {cont}")
-#         print(beam_final[i])
-#
-# print(beam_final)
-# #         dist_bound = np.sum(beam_final[i]['pos'] * beam_final[i]['dir'])
-# #         dist = np.minimum(dist_step, dist_bound)
-# #         beam_final[i]['pos'] = beam_final[i]['pos'] + (dist * beam_final[i]['dir'])
-# #         norm = np.linalg.norm(beam_final[i]['pos'])
-# #         if (norm > sphere_r):
-# #             pichintun = sphere_r - norm
-# #             beam_final[i]['alive'] = False
-#             beam_final[i]['pos'] = beam_final[i]['pos'] + (pichintun * beam_final[i]['dir'])
-#             norm = np.linalg.norm(beam_final[i]['pos'])
-#
-#             # beam_final[i]['pos'] = [0.0, 0.0, sphere_r]
-#             break;
-# #
-#         # print(beam_final[i])
-#         print(norm)
-#
-    # print(beam_final)
-
-
-
-#
-#
-#
-# print(beam[0]['energy'])
-# # # Verify if the particles are inside the defined geometry
-# # initial_r = np.linalg.norm(beam['pos'], axis=1)
-# # beam['alive'] = initial_r <= sphere_r
-#
-# # Transport the particles with the following function
-# def trans_part(beam_array, sigma):
-#     lengths = -np.log(np.random.rand(len(beam_array))) / sigma
-#     lengths_reshaped = lengths[:, np.newaxis]
-#
-#     beam_array['pos'] = beam_array['pos'] + (lengths_reshaped * beam_array['dir'])
-#     return beam_array
-#
-#
-#
-# print("Antes del transporte: ")
-# print(beam)
-#
-# cont = 1
-# #
-# # for i in range(len(beam)):
-# #     beam_final =
-# while (beam['alive']):
-#
-#     mask = beam['alive']
-#     beam[mask] = trans_part(beam[mask], sigma_mat)
-#     new_r = np.linalg.norm(beam['pos'][mask], axis=1)
-#     beam['alive'][mask] = new_r <= sphere_r
-#     print(f"Transporte en el material paso {cont}: ")
-#     print(beam)
-#     cont += 1
-#
-#
-#
-#
-#
