@@ -75,6 +75,9 @@ for i in range(nro_part):
         else:
             region = 1
 
+
+
+
         if (region == 1):
             sigma = sigma_sph
         elif (region == 2):
@@ -97,6 +100,8 @@ for i in range(nro_part):
         for k in range(3):
             if dirc[k] < 1e-10:
                 dirc[k] = 1e-14
+
+                P_x(t) = P_0 + t * dirc_x
 
         tmin_x, tmax_x = (x_min - pos[0]) / dirc[0], (x_max - pos[0]) / dirc[0]
         tmin_y, tmax_y = (y_min - pos[1]) / dirc[1], (y_max - pos[1]) / dirc[1]

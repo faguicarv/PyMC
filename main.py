@@ -20,32 +20,54 @@ dir_0 = dir_0 / np.linalg.norm(dir_0) # Normalization of the direction
 ## ---------
 # --------- END DEFINITION OF SOURCE ---------
 
-
 beam = beam_definition(part_type, nro_part, pos_0, dir_0, energy_0)
-print(beam)
-#
-# # --------- GEOMETRY DEFINITION ---------
-# ## --------- UNIVERSE ---------
-# sphere_r = 30.0 # With this vector we will define a sphere of radius 10.0
-# box_layout = np.dtype([
-#     ("type", "i4"), # Geometric body
-#     ("xdims", 'f8', (2,)),
-#     ("ydims", 'f8', (2,)),
-#     ("zdims", 'f8', (2,)),
-#     ])
-#
-# box = np.zeros(1, dtype=box_layout)
-#
-# body = 'box'
-# if body == 'box':
-#     body = int(1)
-#
-# box['type'], box['xdims'], box['ydims'], box['zdims'] = body, np.array([-4.0, 4.0]), np.array([-4.0, 4.0]), np.array([5.0, 15.0])
-#
-# # Once the beam is ready, the transport occur in the incoming lines
-# sigma_sph = 1e1
-# sigma_box = 5e1
-#
+
+# --------- GEOMETRY DEFINITION ---------
+# # --------- UNIVERSE ---------
+body = 'sphere'
+sphere_r = 30.0 # With this vector we will define a sphere of radius 10.0
+sphere_o = np.array([0.0, 0.0, 0.0])
+
+def geometry_body(body_type):
+    if (body_type == 'sphere'):
+        sphere_layout = np.dtype([
+            ("type", "i4"),
+            ("radius", "f8"),
+            ("origin", "f8", (3,))
+            ])
+        sphere = np.zeros(1, dtype=sphere_layout)
+        sphere['type'], sphere['radius'], sphere['origin'] = body, sphere_r, sphere_o
+
+
+
+
+
+
+
+
+
+if (body == 'sphere'):
+    body = int(1)
+
+box_layout = np.dtype([
+    ("type", "i4"), # Geometric body
+    ("xdims", 'f8', (2,)),
+    ("ydims", 'f8', (2,)),
+    ("zdims", 'f8', (2,)),
+    ])
+
+box = np.zeros(1, dtype=box_layout)
+
+body = 'box'
+if body == 'box':
+    body = int(2)
+
+box['type'], box['xdims'], box['ydims'], box['zdims'] = body, np.array([-4.0, 4.0]), np.array([-4.0, 4.0]), np.array([5.0, 15.0])
+
+# Once the beam is ready, the transport occur in the incoming lines
+sigma_sph = 1e1
+sigma_box = 5e1
+
 # beam_final = np.zeros(nro_part, dtype=particle_layout)
 # for i in range(nro_part):
 #     print(f"Transporte de la partícula {i+1}")
