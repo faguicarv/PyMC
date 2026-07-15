@@ -16,7 +16,18 @@ def beam_definition(part, number_part, pos, dirc, energy):
         ])
 
     source = np.zeros(number_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
+    particles = np.zeros(number_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
     source['type'], source['pos'], source['energy'], source['dir'], source['alive'], source['region'] = part, pos, energy, dirc, True, 0 # Fill the beam layout with the data of the beam definition
-    return source
+    return source, particles
 
+def box_def(xlim, ylim, zlim):
+    box_layout = np.dtype([
+    ("xdims", 'f8', (2,)),
+    ("ydims", 'f8', (2,)),
+    ("zdims", 'f8', (2,)),
+    ])
+
+    box = np.zeros(1, dtype=box_layout)
+    box['xdims'], box['ydims'], box['zdims'] = np.array(xlim), np.array(ylim), np.array(zlim)
+    return box
 
