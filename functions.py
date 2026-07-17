@@ -27,7 +27,8 @@ def geometry_body(body_type, **kwargs):
             ("origin", "f8", (3,))
             ])
         sphere = np.zeros(1, dtype=sphere_layout)
-        sphere['radius'], sphere['origin'] = kwargs['radius'], kwargs['origin']
+        # sphere['radius'], sphere['center'] = kwargs['radius'], kwargs['origin']
+        sphere['radius'] = kwargs['radius']
         return sphere
 
     elif (body_type == 'box'):
@@ -39,4 +40,3 @@ def geometry_body(body_type, **kwargs):
         box = np.zeros(1, dtype=box_layout)
         box['xdims'], box['ydims'], box['zdims'] = kwargs['xdims'], kwargs['ydims'], kwargs['zdims']
         return box
-
