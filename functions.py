@@ -13,11 +13,23 @@ def beam_definition(**kwargs):
         ('alive', 'b1') # Border condition
         ])
 
+    number_part = kwargs['number_particles']
     if (kwargs['particle'] == 'neutron'):
         kwargs['particle'] = 21
-    number_part = kwargs['number_particles']
+
     source = np.zeros(number_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
-    source['type'], source['pos'], source['dir'], source['energy'], source['alive'], source['region'] = kwargs['particle'], kwargs['position'], kwargs['direction'], kwargs['energy'], True, 0 # Fill the beam layout with the data of the beam definition
+    source['type'], source['pos'], source['energy'], source['alive'], source['region'] = kwargs['particle'], kwargs['position'], kwargs['energy'], True, 0 # Fill the beam layout with the data of the beam definition
+
+    if isinstance(kwargs['direction'], str) and kwargs['direction'].lower() == 'isotropic':
+        rng = np.random.default_rng()
+        cos_theta = rng.uniform(-1.0, 1.0, number_part)
+        sin_theta = np.sqrt(1.0 - cos_theta**2)
+        phi = rng.uniform(0.0, 2*np.pi, number_part)
+        x = sin_theta * np.cos(phi)
+        y = sin_theta * np.sin(phi)
+        z = cos_theta
+        source['dir'] = np.column_stack((x, y, z))
+
     return source
 
 def geometry_body(body_type, **kwargs):
