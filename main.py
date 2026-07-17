@@ -3,33 +3,38 @@ import scipy as sc
 import matplotlib.pyplot as plt
 from functions import *
 import csv
-
-# --------- DEFINE SOURCE WITH NUMPY ---------
-## --------- SOURCE PARTICLE ---------
-part_type = str('neutron') # Beam type
-## --------- NUMBER OF PRIMARY PARTICLES ---------
-nro_part = 20
-## --------- INITIAL ENERGY - MONOENERGETIC ---------
-energy_0 = 2.44e1 # Monoenergetic beam
-## --------- POSITION OF SOURCE ---------
-pos_0 = np.array([0.0, 0.0, 0.0])
-## --------- DIRECTION OF SOURCE - ISOTROPIC ---------
-dir_0 = np.random.randn(nro_part, 3)
-## --------- DIRECTION OF SOURCE - MONODIRECTIONAL ---------
+#
+# # --------- DEFINE SOURCE WITH NUMPY ---------
+# ## --------- SOURCE PARTICLE ---------
+# part_type = str('neutron') # Beam type
+# ## --------- NUMBER OF PRIMARY PARTICLES ---------
+# nro_part = 20
+# ## --------- INITIAL ENERGY - MONOENERGETIC ---------
+# energy_0 = 2.44e1 # Monoenergetic beam
+# ## --------- POSITION OF SOURCE ---------
+# pos_0 = np.array([0.0, 0.0, 0.0])
+# ## --------- DIRECTION OF SOURCE - ISOTROPIC ---------
+# # dir_0 = np.random.randn(nro_part, 3)
+# ## --------- DIRECTION OF SOURCE - MONODIRECTIONAL ---------
 # dir_0 = np.array([0.0, 0.0, 3.4])
-dir_0 = dir_0 / np.linalg.norm(dir_0) # Normalization of the direction
-## ---------
-# --------- END DEFINITION OF SOURCE ---------
+# dir_0 = dir_0 / np.linalg.norm(dir_0) # Normalization of the direction
+# ## ---------
+# # --------- END DEFINITION OF SOURCE ---------
 
-beam, beam_final = beam_definition(part_type, nro_part, pos_0, dir_0, energy_0)
+# # --------- DEFINE SOURCE WITH NUMPY ---------
+beam, beam_final = beam_definition(particle='neutron', number_particles=20, position=np.array([0.0, 0.0, 0.0]), direction=np.array([0.0, 0.0, 3.4]), energy=2.44e1)
+# # --------- END DEFINITION OF SOURCE ---------
 
 # --------- GEOMETRY DEFINITION ---------
 ## --------- UNIVERSE ---------
-sphere_r = 30.0 # With this vector we will define a sphere of radius 30.0
-## --------- BOX ---------
-xlim, ylim, zlim = [-4.0, 4.0], [-4.0, 4.0], [5.0, 15.0]
-box = box_def(xlim, ylim, zlim)
-## ---------
+# ## --------- SPHERE ---------
+sphere = geometry_body('sphere', radius=30, origin=np.array([0.0, 0.0, 0.0])) # Define sphere or radius 30 and center at origin
+# ## --------- BOX ---------
+# xlim, ylim, zlim = [-4.0, 4.0], [-4.0, 4.0], [5.0, 15.0]
+# box = box_def(xlim, ylim, zlim)
+box = geometry_body('box', xdims=[-4.0, 4.0], ydims=[-4.0, 4.0], zdims=[5.0, 15.0]) # Define box with those dimensions
+# ## ---------
+
 
 sigma_sph = 3
 # Once the beam is ready, the transport occur in the incoming lines
@@ -39,8 +44,9 @@ with open('pos.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile, delimiter=' ',
                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
-    for i in range(nro_part):
+    for i in range(len(beam)):
         print(f"Transporte de la partícula {i+1}")
+        print("Partícula, Posición, Energía, Dirección, Región, Estado")
         beam_final[i] = beam[i] # Copy beam information in a new layout
         cont = 0
         while (beam_final[i]['alive']):
@@ -59,7 +65,7 @@ with open('pos.csv', 'w', newline='') as csvfile:
                 beam_final[i]['alive'] = False
 
 
-            elif (np.dot(pos, pos) > sphere_r**2):
+            elif (np.dot(pos, pos) > sphere['radius']**2):
                 region = 3
                 beam_final[i]['alive'] = False
                 continue
@@ -178,16 +184,6 @@ with open('pos.csv', 'w', newline='') as csvfile:
 # body = 'sphere'
 # sphere_r = 30.0 # With this vector we will define a sphere of radius 10.0
 # sphere_o = np.array([0.0, 0.0, 0.0])
-#
-# def geometry_body(body_type):
-#     if (body_type == 'sphere'):
-#         sphere_layout = np.dtype([
-#             ("type", "i4"),
-#             ("radius", "f8"),
-#             ("origin", "f8", (3,))
-#             ])
-#         sphere = np.zeros(1, dtype=sphere_layout)
-#         sphere['type'], sphere['radius'], sphere['origin'] = body, sphere_r, sphere_o
 #
 
 
