@@ -17,9 +17,8 @@ def beam_definition(**kwargs):
         kwargs['particle'] = 21
     number_part = kwargs['number_particles']
     source = np.zeros(number_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
-    particles = np.zeros(number_part, dtype=particle_layout) # Create an auxiliar layout with the same shape to re-write the initial values of the beam
     source['type'], source['pos'], source['dir'], source['energy'], source['alive'], source['region'] = kwargs['particle'], kwargs['position'], kwargs['direction'], kwargs['energy'], True, 0 # Fill the beam layout with the data of the beam definition
-    return source, particles
+    return source
 
 def geometry_body(body_type, **kwargs):
     if (body_type == 'sphere'):

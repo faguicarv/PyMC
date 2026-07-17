@@ -22,7 +22,11 @@ import csv
 # # --------- END DEFINITION OF SOURCE ---------
 
 # # --------- DEFINE SOURCE WITH NUMPY ---------
-beam, beam_final = beam_definition(particle='neutron', number_particles=20, position=np.array([0.0, 0.0, 0.0]), direction=np.array([0.0, 0.0, 3.4]), energy=2.44e1)
+beam = beam_definition(particle = 'neutron',
+                                   number_particles = 20,
+                                   position = np.array([0.0, 0.0, 0.0]),
+                                   direction = np.array([0.0, 0.0, 3.4]),
+                                   energy = 2.44e1)
 # # --------- END DEFINITION OF SOURCE ---------
 
 # --------- GEOMETRY DEFINITION ---------
@@ -39,11 +43,13 @@ box = geometry_body('box', xdims=[-4.0, 4.0], ydims=[-4.0, 4.0], zdims=[5.0, 15.
 sigma_sph = 3
 # Once the beam is ready, the transport occur in the incoming lines
 sigma_box = 10
+# with open('pos.csv', 'w', newline='') as csvfile:
+#     writer = csv.writer(csvfile, delimiter=' ',
+#                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
-with open('pos.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile, delimiter=' ',
-                        quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
+def begin_transport():
+    beam_final = np.zeros_like(beam)
     for i in range(len(beam)):
         print(f"Transporte de la partícula {i+1}")
         print("Partícula, Posición, Energía, Dirección, Región, Estado")
@@ -144,27 +150,16 @@ with open('pos.csv', 'w', newline='') as csvfile:
                     dirc[k] = 0.0
 
             beam_final[i]['pos'] = pos
-            if (beam_final[i]['alive'] == False):
-                writer.writerow(beam_final[i]['pos'])
-            # if (np.sqrt(np.dot(pos, pos)) == dist_sigma):
+            # if (beam_final[i]['alive'] == False):
+            #     writer.writerow(beam_final[i]['pos'])
+            # # if (np.sqrt(np.dot(pos, pos)) == dist_sigma):
 
             beam_final[i]['region'] = region
 
             print(beam_final[i])
+    return
 
-    # print(beam_final)
-
-
-
-
-
-
-
-
-
-
-
-
+begin_transport()
 
 
 
